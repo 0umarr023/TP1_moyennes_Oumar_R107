@@ -1,27 +1,23 @@
-# VERSION 1 : notes et coefficients saisis au clavier
+# VERSION 2 : notes et coefficients dans des listes
 
-nb_moyennes = int(input("Nombre de modules : "))
+matieres = [f"R{i}" for i in range(101, 116)] + [f"SAE{i}" for i in range(11, 17)]
+
+notes = [12, 14, 10, 15, 11, 13, 16, 9, 12, 14, 13, 11, 15, 12, 10, 14, 13, 12, 15, 11, 13]
+
+coef1 = [10, 10, 7, 7, 0, 5, 6, 0, 5, 4, 5, 5, 20, 20, 0, 0, 0, 7, 0, 0, 0]
+coef2 = [4, 0, 2, 8, 6, 0, 0, 0, 0, 5, 5, 2, 9, 9, 3, 0, 0, 29, 0, 0, 7]
+coef3 = [4, 0, 2, 0, 0, 5, 15, 6, 4, 5, 5, 2, 0, 0, 3, 0, 0, 0, 20, 20, 7]
 
 total1 = total2 = total3 = 0
-coef1 = coef2 = coef3 = 0
 
-for i in range(nb_moyennes):
-    note = float(input("Rentrez la note : "))
-    c1 = float(input("Rentrez le coefficient UE1 : "))
-    c2 = float(input("Rentrez le coefficient UE2 : "))
-    c3 = float(input("Rentrez le coefficient UE3 : "))
+for i in range(len(matieres)):
+    total1 += notes[i] * coef1[i]
+    total2 += notes[i] * coef2[i]
+    total3 += notes[i] * coef3[i]
 
-    total1 += note * c1
-    total2 += note * c2
-    total3 += note * c3
-
-    coef1 += c1
-    coef2 += c2
-    coef3 += c3
-
-ue1 = total1 / coef1
-ue2 = total2 / coef2
-ue3 = total3 / coef3
+ue1 = total1 / sum(coef1)
+ue2 = total2 / sum(coef2)
+ue3 = total3 / sum(coef3)
 
 print("UE1", ue1)
 print("UE2", ue2)
