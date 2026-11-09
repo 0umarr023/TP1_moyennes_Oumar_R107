@@ -1,52 +1,53 @@
-# VERSION 4 : visualisation graphique et commentaire sur la décision du jury
+# VERSION 5 : interface graphique avec Tkinter
 
+from tkinter import *
 import matplotlib.pyplot as plt
 
 matieres = [f"R{i}" for i in range(101, 116)] + [f"SAE{i}" for i in range(11, 17)]
 
-liste_notes = [12, 14, 10, 15, 11, 13, 16, 9, 12, 14, 13, 11, 15, 12, 10, 14, 13, 12, 15, 11, 13]
-liste_coef1 = [10, 10, 7, 7, 0, 5, 6, 0, 5, 4, 5, 5, 20, 20, 0, 0, 0, 7, 0, 0, 0]
-liste_coef2 = [4, 0, 2, 8, 6, 0, 0, 0, 0, 5, 5, 2, 9, 9, 3, 0, 0, 29, 0, 0, 7]
-liste_coef3 = [4, 0, 2, 0, 0, 5, 15, 6, 4, 5, 5, 2, 0, 0, 3, 0, 0, 0, 20, 20, 7]
+coef1 = [10, 10, 7, 7, 0, 5, 6, 0, 5, 4, 5, 5, 20, 20, 0, 0, 0, 7, 0, 0, 0]
+coef2 = [4, 0, 2, 8, 6, 0, 0, 0, 0, 5, 5, 2, 9, 9, 3, 0, 0, 29, 0, 0, 7]
+coef3 = [4, 0, 2, 0, 0, 5, 15, 6, 4, 5, 5, 2, 0, 0, 3, 0, 0, 0, 20, 20, 7]
 
-dicnote = {cle: valeur for cle, valeur in zip(matieres, liste_notes)}
-diccoef1 = {cle: valeur for cle, valeur in zip(matieres, liste_coef1)}
-diccoef2 = {cle: valeur for cle, valeur in zip(matieres, liste_coef2)}
-diccoef3 = {cle: valeur for cle, valeur in zip(matieres, liste_coef3)}
+champs = []
 
-totaux = [0, 0, 0]
-for m in matieres:
-    totaux[0] += dicnote[m] * diccoef1[m]
-    totaux[1] += dicnote[m] * diccoef2[m]
-    totaux[2] += dicnote[m] * diccoef3[m]
+def calcul():
+    total1 = 0
+    total2 = 0
+    total3 = 0
+    for i in range(len(matieres)):
+        note = float(champs[i].get())
+        total1 = total1 + note * coef1[i]
+        total2 = total2 + note * coef2[i]
+        total3 = total3 + note * coef3[i]
 
-moyennes = [totaux[0] / sum(diccoef1.values()),
-            totaux[1] / sum(diccoef2.values()),
-            totaux[2] / sum(diccoef3.values())]
+    ue1 = total1 / sum(coef1)
+    ue2 = total2 / sum(coef2)
+    ue3 = total3 / sum(coef3)
 
-print("=" * 40)
-print(f"UE1 : {moyennes[0]:.2f}")
-print(f"UE2 : {moyennes[1]:.2f}")
-print(f"UE3 : {moyennes[2]:.2f}")
-print("=" * 40)
+    if ue1 >= 10 and ue2 >= 10 and ue3 >= 10:
+        decision = "Année validée"
+    else:
+        decision = "Année non validée"
 
-# Décision du jury (les 4 cas du sujet)
-validees = sum(1 for m in moyennes if m >= 10)
-if validees == 3:
-    print("Année validée, passage en BUT2")
-elif validees == 2 and min(moyennes) >= 8:
-    print("Année non validée, mais passage en BUT2 (UE à repasser)")
-elif validees == 2:
-    print("Année non validée, redoublement possible")
-else:
-    print("Année non validée, pas de passage en BUT2")
+    texte = "UE1 : " + str(round(ue1, 2)) + "\nUE2 : " + str(round(ue2, 2)) + "\nUE3 : " + str(round(ue3, 2)) + "\n" + decision
+    Label(fenetre, text=texte).grid(row=23, column=0, columnspan=2)
 
-# Graphique
-noms_ue = ["UE1", "UE2", "UE3"]
-plt.bar(noms_ue, moyennes)
-plt.axhline(y=10, color='red', linestyle='--', label='Validation (10)')
-plt.ylabel("Moyenne")
-plt.title("Moyennes par UE")
-plt.ylim(0, 20)
-plt.legend()
-plt.show()
+    plt.bar(["UE1", "UE2", "UE3"], [ue1, ue2, ue3])
+    plt.axhline(10, color="red", linestyle="--")
+    plt.ylim(0, 20)
+    plt.show()
+
+fenetre = Tk()
+
+Label(fenetre, text="SEMESTRE 1").grid(row=0, column=0, columnspan=2)
+
+for i in range(len(matieres)):
+    Label(fenetre, text=matieres[i]).grid(row=i+1, column=0)
+    champ = Entry(fenetre, width=10)
+    champ.grid(row=i+1, column=1)
+    champs.append(champ)
+
+Button(fenetre, text="Calculer", command=calcul).grid(row=22, column=0, columnspan=2)
+
+fenetre.mainloop()
