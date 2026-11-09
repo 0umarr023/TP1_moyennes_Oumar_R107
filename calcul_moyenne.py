@@ -1,4 +1,6 @@
-# VERSION 3 : notes et coefficients dans des dictionnaires
+# VERSION 4 : visualisation graphique et commentaire sur la décision du jury
+
+import matplotlib.pyplot as plt
 
 matieres = [f"R{i}" for i in range(101, 116)] + [f"SAE{i}" for i in range(11, 17)]
 
@@ -7,40 +9,44 @@ liste_coef1 = [10, 10, 7, 7, 0, 5, 6, 0, 5, 4, 5, 5, 20, 20, 0, 0, 0, 7, 0, 0, 0
 liste_coef2 = [4, 0, 2, 8, 6, 0, 0, 0, 0, 5, 5, 2, 9, 9, 3, 0, 0, 29, 0, 0, 7]
 liste_coef3 = [4, 0, 2, 0, 0, 5, 15, 6, 4, 5, 5, 2, 0, 0, 3, 0, 0, 0, 20, 20, 7]
 
-# Création des dictionnaires : matière -> valeur
 dicnote = {cle: valeur for cle, valeur in zip(matieres, liste_notes)}
 diccoef1 = {cle: valeur for cle, valeur in zip(matieres, liste_coef1)}
 diccoef2 = {cle: valeur for cle, valeur in zip(matieres, liste_coef2)}
 diccoef3 = {cle: valeur for cle, valeur in zip(matieres, liste_coef3)}
 
-total1 = total2 = total3 = 0
-
+totaux = [0, 0, 0]
 for m in matieres:
-    total1 += dicnote[m] * diccoef1[m]
-    total2 += dicnote[m] * diccoef2[m]
-    total3 += dicnote[m] * diccoef3[m]
+    totaux[0] += dicnote[m] * diccoef1[m]
+    totaux[1] += dicnote[m] * diccoef2[m]
+    totaux[2] += dicnote[m] * diccoef3[m]
 
-ue1 = total1 / sum(diccoef1.values())
-ue2 = total2 / sum(diccoef2.values())
-ue3 = total3 / sum(diccoef3.values())
+moyennes = [totaux[0] / sum(diccoef1.values()),
+            totaux[1] / sum(diccoef2.values()),
+            totaux[2] / sum(diccoef3.values())]
 
-print("UE1", ue1)
-print("UE2", ue2)
-print("UE3", ue3)
+print("=" * 40)
+print(f"UE1 : {moyennes[0]:.2f}")
+print(f"UE2 : {moyennes[1]:.2f}")
+print(f"UE3 : {moyennes[2]:.2f}")
+print("=" * 40)
 
-nb_ue_validees = 0
-if ue1 >= 10:
-    nb_ue_validees += 1
-if ue2 >= 10:
-    nb_ue_validees += 1
-if ue3 >= 10:
-    nb_ue_validees += 1
-
-if nb_ue_validees == 3:
+# Décision du jury (les 4 cas du sujet)
+validees = sum(1 for m in moyennes if m >= 10)
+if validees == 3:
     print("Année validée, passage en BUT2")
-elif nb_ue_validees == 2 and min(ue1, ue2, ue3) >= 8:
-    print("Année non validée, mais passage en BUT2")
-elif nb_ue_validees == 2:
+elif validees == 2 and min(moyennes) >= 8:
+    print("Année non validée, mais passage en BUT2 (UE à repasser)")
+elif validees == 2:
     print("Année non validée, redoublement possible")
 else:
     print("Année non validée, pas de passage en BUT2")
+
+# Graphique
+noms_ue = ["UE1", "UE2", "UE3"]
+plt.bar(noms_ue, moyennes)
+plt.axhline(y=10, color='red', linestyle='--', label='Validation (10)')
+plt.ylabel("Moyenne")
+plt.title("Moyennes par UE")
+plt.ylim(0, 20)
+plt.legend()
+plt.show()
